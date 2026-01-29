@@ -1,11 +1,19 @@
-import { HistoryIcon, HouseIcon, SettingsIcon, SunIcon } from 'lucide-react';
+import { HistoryIcon, HouseIcon, MoonIcon, SettingsIcon, SunIcon } from 'lucide-react';
 import styles from './styles.module.css';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-type AvailableThemes = 'dark' | 'light'
+type AvailableThemes = 'dark' | 'light';
 
 export function Menu() {
-    const [theme, setTheme] = useState<AvailableThemes>('dark');
+    const [theme, setTheme] = useState<AvailableThemes>(() => {
+        const storageTheme = localStorage.getItem('theme') as AvailableThemes || 'dark';
+        return storageTheme;
+    });
+
+    const nextThemeIcon = {
+        dark: <SunIcon />,
+        light: <MoonIcon />
+    }
 
     function handleThemeChange(e: React.MouseEvent) {
         e.preventDefault();
@@ -16,6 +24,11 @@ export function Menu() {
         })
     }
     
+    useEffect(() => {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+    }, [theme]); //Executa apenas quando o valor de theme muda
+
     return <nav className={styles.menu}>
         <a className={styles.menuLink} href="" aria-label='Ir para a Home' title='Ir para a Home'>
             <HouseIcon />
@@ -27,7 +40,7 @@ export function Menu() {
             <SettingsIcon />
         </a>
         <a className={styles.menuLink} href="#" aria-label='Alterar Tema do Site' title='Alterar Tema' onClick={handleThemeChange}>
-            <SunIcon />
+            {nextThemeIcon[theme]}
         </a>
     </nav>;
 }
